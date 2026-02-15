@@ -1,0 +1,237 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-implement-a-playable-3d-arcade-racing-loop-in-the-react-frontend-using-three-js-react-three-fiber-the-player-car-continuously-moves-forward-supports-steering-left-right-keyboard-and-optional-mobile-tilt-steering-has-a-simple-drift-handling-mode-at-high-steering-input-and-can-brake-stop-forward-movement",
+      "featureTitle": "Implement a playable 3D arcade racing loop in the React frontend using Three.js / React Three Fiber: the player car continuously moves forward, supports steering left/right (keyboard) and optional mobile tilt steering, has a simple drift handling mode at high steering input, and can brake/stop forward movement.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/game/RaceView.tsx",
+        "frontend/src/game/controls/useKeyboardDrivingControls.ts",
+        "frontend/src/game/controls/useTiltSteering.ts",
+        "frontend/src/game/scene/RaceScene.tsx",
+        "frontend/src/game/sim/constants.ts",
+        "frontend/src/game/sim/useCarPhysics.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-modular-garage-car-selection-system-in-the-frontend-provide-multiple-selectable-car-models-skins-at-least-6-variants-display-the-currently-selected-car-name-and-persist-the-selected-car-across-reloads",
+      "featureTitle": "Add a modular garage/car selection system in the frontend: provide multiple selectable car models/skins (at least 6 variants), display the currently selected car name, and persist the selected car across reloads.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/game/garage/GarageView.tsx",
+        "frontend/src/game/garage/carLibrary.ts",
+        "frontend/src/game/garage/useSelectedCar.ts",
+        "frontend/src/game/scene/CarModel.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-an-ai-rival-car-in-the-frontend-that-follows-the-track-with-a-simple-deterministic-behavior-e-g-constant-target-speed-with-minor-lateral-variation-and-show-a-position-indicator-that-flips-between-1st-2nd-based-on-relative-progress-along-the-forward-axis",
+      "featureTitle": "Implement an AI rival car in the frontend that follows the track with a simple deterministic behavior (e.g., constant target speed with minor lateral variation), and show a position indicator that flips between 1st/2nd based on relative progress along the forward axis.",
+      "files": [
+        "frontend/src/game/scene/RaceScene.tsx",
+        "frontend/src/game/sim/progress.ts",
+        "frontend/src/game/sim/useRivalAI.ts",
+        "frontend/src/game/ui/HUD.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-day-night-cycle-system-in-the-frontend-animate-a-sun-light-over-time-configurable-day-duration-and-automatically-toggle-headlights-on-the-cars-at-night",
+      "featureTitle": "Add a day/night cycle system in the frontend: animate a sun light over time (configurable day duration) and automatically toggle headlights on the cars at night.",
+      "files": [
+        "frontend/src/game/scene/LightingRig.tsx",
+        "frontend/src/game/scene/RaceScene.tsx",
+        "frontend/src/game/sim/constants.ts",
+        "frontend/src/game/sim/dayNight.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-weather-system-in-the-frontend-with-random-rain-toggles-show-a-rain-particle-effect-animate-windshield-wipers-on-the-player-car-when-raining-and-apply-a-wet-road-handling-modifier-that-increases-sliding-drift-tendency-during-rain",
+      "featureTitle": "Add a weather system in the frontend with random rain toggles: show a rain particle effect, animate windshield wipers on the player car when raining, and apply a wet-road handling modifier that increases sliding/drift tendency during rain.",
+      "files": [
+        "frontend/src/game/scene/RaceScene.tsx",
+        "frontend/src/game/scene/effects/RainEffect.tsx",
+        "frontend/src/game/sim/useCarPhysics.ts",
+        "frontend/src/game/sim/weather.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-a-nitro-boost-system-in-the-frontend-nitro-depletes-while-boosting-regenerates-when-not-boosting-increases-max-speed-while-active-updates-a-nitro-ui-slider-bar-enables-boost-trails-visual-effects-and-increases-camera-shake-intensity-while-boosting",
+      "featureTitle": "Implement a nitro/boost system in the frontend: nitro depletes while boosting, regenerates when not boosting, increases max speed while active, updates a nitro UI slider/bar, enables boost trails/visual effects, and increases camera shake intensity while boosting.",
+      "files": [
+        "frontend/src/game/controls/useKeyboardDrivingControls.ts",
+        "frontend/src/game/scene/CameraRig.tsx",
+        "frontend/src/game/scene/RaceScene.tsx",
+        "frontend/src/game/scene/effects/BoostTrails.tsx",
+        "frontend/src/game/sim/useCarPhysics.ts",
+        "frontend/src/game/sim/useNitro.ts",
+        "frontend/src/game/ui/HUD.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-ui-scoring-systems-in-the-frontend-display-score-high-score-race-timer-mm-ss-and-speed-km-h-add-collectible-coins-that-increment-score-add-nitro-refill-pickups-that-refill-nitro-add-a-finish-line-finish-condition-that-triggers-slow-motion-saves-high-score-then-restarts-the-race",
+      "featureTitle": "Add UI + scoring systems in the frontend: display score, high score, race timer (mm:ss), and speed (km/h); add collectible coins that increment score; add nitro refill pickups that refill nitro; add a finish line/finish condition that triggers slow-motion, saves high score, then restarts the race.",
+      "files": [
+        "frontend/src/game/RaceView.tsx",
+        "frontend/src/game/sim/scoring.ts",
+        "frontend/src/game/sim/useRaceTimer.ts",
+        "frontend/src/game/sim/useSpeedometer.ts",
+        "frontend/src/game/ui/HUD.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-backend-persistence-in-a-single-motoko-actor-for-per-user-high-score-and-optionally-last-selected-car-index-integrate-internet-identity-on-the-frontend-to-read-write-the-authenticated-user-s-high-score-and-show-it-in-the-ui",
+      "featureTitle": "Implement backend persistence in a single Motoko actor for per-user high score (and optionally last selected car index): integrate Internet Identity on the frontend to read/write the authenticated user’s high score and show it in the UI.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/auth/LoginButton.tsx",
+        "frontend/src/game/garage/useSelectedCar.ts",
+        "frontend/src/game/ui/HUD.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-a-coherent-distinctive-visual-theme-for-the-app-ui-and-3d-presentation-colors-typography-hud-layout-and-component-styling-and-apply-it-consistently-across-the-garage-and-race-views-avoid-a-blue-purple-default-palette",
+      "featureTitle": "Create a coherent, distinctive visual theme for the app UI and 3D presentation (colors, typography, HUD layout, and component styling) and apply it consistently across the Garage and Race views (avoid a blue/purple default palette).",
+      "files": [
+        "frontend/src/game/garage/GarageView.tsx",
+        "frontend/src/game/scene/Environment.tsx",
+        "frontend/src/game/scene/RaceScene.tsx",
+        "frontend/src/game/ui/HUD.tsx",
+        "frontend/src/index.css",
+        "frontend/tailwind.config.js"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-9"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-basic-game-state-screens-and-controls-in-the-frontend-start-resume-restart-and-an-in-game-pause-overlay-ensure-user-facing-strings-are-in-english",
+      "featureTitle": "Add basic game-state screens and controls in the frontend: Start/Resume, Restart, and an in-game pause overlay; ensure user-facing strings are in English.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/game/RaceView.tsx",
+        "frontend/src/game/state/gameState.ts",
+        "frontend/src/game/ui/ControlsHelp.tsx",
+        "frontend/src/game/ui/PauseOverlay.tsx",
+        "frontend/src/game/ui/StartOverlay.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-10"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

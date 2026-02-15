@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Unity (3D) arcade racing game prototype centered on an \"UltimateGameMaster\" controller: modular garage with many cars, AI rival position display, day/night cycle and random rain with wipers/headlights, nitro/drift driving, UI (score/speed/timer), collectibles, and finish/restart loop.",
+  "architectural_notes": [
+    "Unity C# MonoBehaviour-centric design with a single game master script coordinating subsystems (garage, world, input/physics, UI, scoring).",
+    "Car prefabs are auto-loaded at runtime from Resources/Cars and instantiated under a modelContainer Transform.",
+    "PlayerPrefs used for persistence (SelectedCar, HighScore).",
+    "Uses trigger colliders with tags (Coin, NitroRefill, FinishLine) to drive scoring/refill/finish events."
+  ],
+  "known_issues": [
+    "Code calls UpdateScoreUI() in Start() but no UpdateScoreUI() method is defined in the provided script.",
+    "Script uses rb.linearVelocity; in standard Unity Rigidbody API this is rb.velocity (linearVelocity may not compile depending on Unity/physics package)."
+  ],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Arcade racing game logo with a stylized car silhouette and bold typography (logo.dim_512x512.png)\n- Seamless asphalt/road texture with subtle wear and lane markings (road-texture.dim_1024x1024.png)\n- Coin icon with metallic gold look, simple readable shape (coin-icon.dim_256x256.png)\n- Nitro/boost icon with a flame/jet motif (nitro-icon.dim_256x256.png)\n- Sky gradient background image suitable as a distant skybox/backdrop (sky-gradient.dim_2048x1024.png)",
+  "existing_features": [
+    {
+      "id": "feature-implement-a-playable-3d-arcade-racing-loop-in-the-react-frontend-using-three-js-react-three-fiber-the-player-car-continuously-moves-forward-supports-steering-left-right-keyboard-and-optional-mobile-tilt-steering-has-a-simple-drift-handling-mode-at-high-steering-input-and-can-brake-stop-forward-movement",
+      "title": "Implement a playable 3D arcade racing loop in the React frontend using Three.js / React Three Fiber: the player car continuously moves forward, supports steering left/right (keyboard) and optional mobile tilt steering, has a simple drift handling mode at high steering input, and can brake/stop forward movement.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-modular-garage-car-selection-system-in-the-frontend-provide-multiple-selectable-car-models-skins-at-least-6-variants-display-the-currently-selected-car-name-and-persist-the-selected-car-across-reloads",
+      "title": "Add a modular garage/car selection system in the frontend: provide multiple selectable car models/skins (at least 6 variants), display the currently selected car name, and persist the selected car across reloads.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-an-ai-rival-car-in-the-frontend-that-follows-the-track-with-a-simple-deterministic-behavior-e-g-constant-target-speed-with-minor-lateral-variation-and-show-a-position-indicator-that-flips-between-1st-2nd-based-on-relative-progress-along-the-forward-axis",
+      "title": "Implement an AI rival car in the frontend that follows the track with a simple deterministic behavior (e.g., constant target speed with minor lateral variation), and show a position indicator that flips between 1st/2nd based on relative progress along the forward axis.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-day-night-cycle-system-in-the-frontend-animate-a-sun-light-over-time-configurable-day-duration-and-automatically-toggle-headlights-on-the-cars-at-night",
+      "title": "Add a day/night cycle system in the frontend: animate a sun light over time (configurable day duration) and automatically toggle headlights on the cars at night.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-weather-system-in-the-frontend-with-random-rain-toggles-show-a-rain-particle-effect-animate-windshield-wipers-on-the-player-car-when-raining-and-apply-a-wet-road-handling-modifier-that-increases-sliding-drift-tendency-during-rain",
+      "title": "Add a weather system in the frontend with random rain toggles: show a rain particle effect, animate windshield wipers on the player car when raining, and apply a wet-road handling modifier that increases sliding/drift tendency during rain.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-nitro-boost-system-in-the-frontend-nitro-depletes-while-boosting-regenerates-when-not-boosting-increases-max-speed-while-active-updates-a-nitro-ui-slider-bar-enables-boost-trails-visual-effects-and-increases-camera-shake-intensity-while-boosting",
+      "title": "Implement a nitro/boost system in the frontend: nitro depletes while boosting, regenerates when not boosting, increases max speed while active, updates a nitro UI slider/bar, enables boost trails/visual effects, and increases camera shake intensity while boosting.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-ui-scoring-systems-in-the-frontend-display-score-high-score-race-timer-mm-ss-and-speed-km-h-add-collectible-coins-that-increment-score-add-nitro-refill-pickups-that-refill-nitro-add-a-finish-line-finish-condition-that-triggers-slow-motion-saves-high-score-then-restarts-the-race",
+      "title": "Add UI + scoring systems in the frontend: display score, high score, race timer (mm:ss), and speed (km/h); add collectible coins that increment score; add nitro refill pickups that refill nitro; add a finish line/finish condition that triggers slow-motion, saves high score, then restarts the race.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-backend-persistence-in-a-single-motoko-actor-for-per-user-high-score-and-optionally-last-selected-car-index-integrate-internet-identity-on-the-frontend-to-read-write-the-authenticated-user-s-high-score-and-show-it-in-the-ui",
+      "title": "Implement backend persistence in a single Motoko actor for per-user high score (and optionally last selected car index): integrate Internet Identity on the frontend to read/write the authenticated user’s high score and show it in the UI.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-coherent-distinctive-visual-theme-for-the-app-ui-and-3d-presentation-colors-typography-hud-layout-and-component-styling-and-apply-it-consistently-across-the-garage-and-race-views-avoid-a-blue-purple-default-palette",
+      "title": "Create a coherent, distinctive visual theme for the app UI and 3D presentation (colors, typography, HUD layout, and component styling) and apply it consistently across the Garage and Race views (avoid a blue/purple default palette).",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-basic-game-state-screens-and-controls-in-the-frontend-start-resume-restart-and-an-in-game-pause-overlay-ensure-user-facing-strings-are-in-english",
+      "title": "Add basic game-state screens and controls in the frontend: Start/Resume, Restart, and an in-game pause overlay; ensure user-facing strings are in English.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Core arcade racing loop with player driving controls (steering, acceleration/brake), drift behavior, and basic physics tuning",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Modular garage/car selection system that loads car prefabs from Resources/Cars and persists selected car",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "AI rival car and simple position indicator (1st/2nd) based on relative progress",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Day/night cycle system with sun rotation and automatic headlight toggling",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Weather system with rain particles, wipers animation, and wet-road handling modifier",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Nitro/boost system with depletion/regeneration, UI slider, trails, and camera shake effect",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "UI + scoring: score, high score persistence, timer, speed readout; collectible coin/nitro refill triggers and finish line slow-motion + restart",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "3d",
+  "projectName": "Create a 3D arcade racing web game inspired by the provided Unity UltimateGameMaster script",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}
