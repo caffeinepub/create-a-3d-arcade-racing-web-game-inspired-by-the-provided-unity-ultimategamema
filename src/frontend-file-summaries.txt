@@ -1,8 +1,8 @@
 {
-  "frontend/src/App.tsx": "Main application component with router setup, authentication state management, profile setup modal, and view switching between Garage and Race.",
-  "frontend/src/hooks/useQueries.ts": "React Query hooks for fetching and saving user profiles with proper actor and authentication state handling.",
+  "frontend/src/App.tsx": "Main application component with error boundary wrapper, profile setup modal gating, profile error banner with recovery UI, and view switching between Garage and Race.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for user profile operations with proper Candid optional normalization, immediate cache updates after save, and consistent null handling.",
   "frontend/src/auth/LoginButton.tsx": "Login/logout button component using Internet Identity with proper query cache clearing on logout.",
-  "frontend/src/auth/ProfileSetupModal.tsx": "Modal dialog for first-time user profile setup after authentication.",
+  "frontend/src/auth/ProfileSetupModal.tsx": "Profile setup modal for first-time users with proper optional field encoding, error handling with toast notifications, and form validation.",
   "frontend/src/game/state/gameState.ts": "Zustand store managing global game state including current view (garage/race) and game status (ready/running/paused/finished).",
   "frontend/src/game/garage/carLibrary.ts": "Car variant definitions with 8 different cars, each with unique colors, names, and speed characteristics.",
   "frontend/src/game/garage/useSelectedCar.ts": "Zustand store with persistence for managing selected car state across sessions.",
@@ -36,5 +36,8 @@
   "frontend/src/game/ui/ControlsHelp.tsx": "Collapsible controls help panel showing keyboard bindings.",
   "frontend/src/game/persistence/useHighScore.ts": "High score persistence hook with backend sync for authenticated users and local storage fallback.",
   "frontend/src/index.css": "Global styles with custom OKLCH color system using orange/cyan accent palette and text shadow utilities.",
-  "frontend/tailwind.config.js": "Tailwind configuration with custom fonts, extended color palette, and racing-themed design tokens."
+  "frontend/tailwind.config.js": "Tailwind configuration with custom fonts, extended color palette, and racing-themed design tokens.",
+  "frontend/src/components/AppErrorBoundary.tsx": "React error boundary component that catches render-time errors and displays the AppFatalErrorScreen with recovery options.",
+  "frontend/src/components/AppFatalErrorScreen.tsx": "Fatal error screen component showing user-friendly error messages with reload and logout recovery actions.",
+  "frontend/src/utils/candidOption.ts": "Utility functions for normalizing and encoding Candid optional types with proper TypeScript type assertions to handle null/undefined/empty-array representations."
 }

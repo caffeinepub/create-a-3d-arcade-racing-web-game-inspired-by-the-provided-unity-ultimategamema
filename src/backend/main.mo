@@ -1,53 +1,56 @@
 import Map "mo:core/Map";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
+import Migration "migration";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
+// Migration setup: Use 'with' clause to specify migration function
+(with migration = Migration.run)
 actor {
-  // Initialize the access control state
-  let accessControlState = AccessControl.initState();
-  include MixinAuthorization(accessControlState);
-
-  // User profile type as required by the frontend
-  public type UserProfile = {
+  type UserProfile = {
     highScore : Nat;
     lastSelectedCarIndex : ?Nat;
   };
 
   let userProfiles = Map.empty<Principal, UserProfile>();
+  let accessControlState = AccessControl.initState();
+  include MixinAuthorization(accessControlState);
 
-  // Get the caller's own profile
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can access profiles");
+    // Allow any authenticated user to read their own profile
+    if (caller.isAnonymous()) {
+      Runtime.trap("Unauthorized: Anonymous users cannot access profiles");
     };
     userProfiles.get(caller);
   };
 
-  // Get any user's profile (own profile or admin can view others)
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
+    // Users can view their own profile, admins can view any profile
+    if (caller.isAnonymous()) {
+      Runtime.trap("Unauthorized: Anonymous users cannot access profiles");
+    };
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
       Runtime.trap("Unauthorized: Can only view your own profile");
     };
     userProfiles.get(user);
   };
 
-  // Save the caller's own profile
   public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can save profiles");
+    // Allow any authenticated user to save their own profile
+    if (caller.isAnonymous()) {
+      Runtime.trap("Unauthorized: Anonymous users cannot save profiles");
     };
     userProfiles.add(caller, profile);
   };
 
-  // Legacy function for backward compatibility - save high score only
   public shared ({ caller }) func saveHighScore(score : Nat) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can save scores");
+    // Allow any authenticated user to save their score
+    if (caller.isAnonymous()) {
+      Runtime.trap("Unauthorized: Anonymous users cannot save scores");
     };
-    
-    // Get existing profile or create new one
+
+    // Create new profile if none exists
     let existingProfile = userProfiles.get(caller);
     let newProfile = switch (existingProfile) {
       case (null) {
@@ -57,17 +60,17 @@ actor {
         { highScore = score; lastSelectedCarIndex = profile.lastSelectedCarIndex };
       };
     };
-    
+
     userProfiles.add(caller, newProfile);
   };
 
-  // Legacy function for backward compatibility - get high score only
   public query ({ caller }) func getHighScore() : async Nat {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can fetch scores");
+    // Allow any authenticated user to fetch their score
+    if (caller.isAnonymous()) {
+      Runtime.trap("Unauthorized: Anonymous users cannot fetch scores");
     };
     switch (userProfiles.get(caller)) {
-      case (null) { Runtime.trap("No high score found. Run the first race!") };
+      case (null) { 0 }; // Return 0 for new users instead of trapping
       case (?profile) { profile.highScore };
     };
   };

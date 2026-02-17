@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Label } from '../components/ui/label';
+import { toast } from 'sonner';
 
 export default function ProfileSetupModal() {
   const [name, setName] = useState('');
@@ -12,10 +13,17 @@ export default function ProfileSetupModal() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      await saveProfile.mutateAsync({
-        highScore: BigInt(0),
-        lastSelectedCarIndex: undefined,
-      });
+      try {
+        await saveProfile.mutateAsync({
+          highScore: BigInt(0),
+          // Omit lastSelectedCarIndex entirely (undefined encodes as opt-none in Candid)
+          lastSelectedCarIndex: undefined,
+        });
+        toast.success('Profile created! Welcome to Nitro Rush!');
+      } catch (error: any) {
+        console.error('Failed to save profile:', error);
+        toast.error(error.message || 'Failed to create profile. Please try again.');
+      }
     }
   };
 
@@ -39,6 +47,11 @@ export default function ProfileSetupModal() {
               autoFocus
             />
           </div>
+          {saveProfile.isError && (
+            <p className="text-sm text-destructive">
+              Failed to create profile. Please try again.
+            </p>
+          )}
           <Button type="submit" className="w-full" disabled={!name.trim() || saveProfile.isPending}>
             {saveProfile.isPending ? 'Setting up...' : 'Start Racing'}
           </Button>

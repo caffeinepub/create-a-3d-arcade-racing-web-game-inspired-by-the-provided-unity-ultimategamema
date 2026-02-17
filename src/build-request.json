@@ -1,227 +1,103 @@
 {
   "kind": "build_request",
-  "title": "Create a 3D arcade racing web game inspired by the provided Unity UltimateGameMaster script",
-  "priority": "normal",
+  "title": "Fix deployment/runtime error blocking app usage (profile + backend state)",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Implement a playable 3D arcade racing loop in the React frontend using Three.js / React Three Fiber: the player car continuously moves forward, supports steering left/right (keyboard) and optional mobile tilt steering, has a simple drift handling mode at high steering input, and can brake/stop forward movement.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "This is my new game app code make it"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A 3D scene renders in the browser with a controllable player car and a visible track/ground plane.",
-        "Keyboard controls: left/right steer; brake key reduces/halts forward speed; gameplay is smooth at 60fps on a typical laptop.",
-        "If device orientation is available, tilt steering can be toggled on and used on mobile without breaking keyboard input on desktop.",
-        "A drift state activates when steering exceeds a threshold, visibly altering handling (e.g., lower lateral grip / more slide)."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Add a modular garage/car selection system in the frontend: provide multiple selectable car models/skins (at least 6 variants), display the currently selected car name, and persist the selected car across reloads.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "[Header(\"Modular Garage (100+ Cars)\")]",
-          "carLibrary.AddRange(Resources.LoadAll<GameObject>(\"Cars\"));",
-          "PlayerPrefs.SetInt(\"SelectedCar\", index);"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A Garage screen/panel lets the user cycle/select among multiple car variants.",
-        "The selected car name is shown in the UI.",
-        "The selection persists after refresh (e.g., via local storage) and is applied when starting the race."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Implement an AI rival car in the frontend that follows the track with a simple deterministic behavior (e.g., constant target speed with minor lateral variation), and show a position indicator that flips between 1st/2nd based on relative progress along the forward axis.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "[Header(\"AI Rival & Racing\")]",
-          "positionText.text = transform.position.z > rivalCar.position.z ? \"POS: 1st\" : \"POS: 2nd\";"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A rival car is visible in the 3D scene during the race.",
-        "A UI label shows \"POS: 1st\" or \"POS: 2nd\" and updates as the player overtakes or falls behind the rival."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Add a day/night cycle system in the frontend: animate a sun light over time (configurable day duration) and automatically toggle headlights on the cars at night.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "[Header(\"Day/Night & Weather\")]",
-          "public float dayDuration = 120f;",
-          "bool night = t > 0.73f || t < 0.27f;",
-          "foreach (Light h in headlights) if (h) h.enabled = night;"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Lighting changes over time to simulate day-to-night progression on a loop.",
-        "At night, car headlights visibly turn on; during day, they turn off.",
-        "Day duration is configurable from a single constant/config value in the frontend."
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Add a weather system in the frontend with random rain toggles: show a rain particle effect, animate windshield wipers on the player car when raining, and apply a wet-road handling modifier that increases sliding/drift tendency during rain.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "if (Random.value < 0.0005f) ToggleWeather(!isRaining);",
-          "if (isRaining) AnimateWipers();",
-          "rb.linearVelocity = forwardVel + (rightVel * (isDrifting ? (isRaining ? 0.99f : 0.95f) : 0.05f));"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Rain can toggle on/off during gameplay (randomly and/or via a debug UI toggle).",
-        "When raining, a visible rain effect is present and wipers animate on the player car.",
-        "When raining, handling becomes noticeably more slippery compared to dry conditions."
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "Implement a nitro/boost system in the frontend: nitro depletes while boosting, regenerates when not boosting, increases max speed while active, updates a nitro UI slider/bar, enables boost trails/visual effects, and increases camera shake intensity while boosting.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "[Header(\"Physics & Nitro\")]",
-          "isBoosting = Input.GetKey(KeyCode.Space) && currentNitro > 0;",
-          "if (nitroSlider) nitroSlider.value = currentNitro;",
-          "foreach (var t in nitroTrails) if(t) t.emitting = isBoosting;",
-          "float shake = isBoosting ? 0.2f : ..."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Holding the boost key activates boost if nitro > 0; nitro decreases while active and regenerates when inactive.",
-        "Boost increases forward speed compared to normal driving.",
-        "A nitro UI bar reflects current nitro in real time.",
-        "Boost trails/visual effects toggle on only while boosting.",
-        "Camera shake is stronger during boost than during normal driving."
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "text": "Add UI + scoring systems in the frontend: display score, high score, race timer (mm:ss), and speed (km/h); add collectible coins that increment score; add nitro refill pickups that refill nitro; add a finish line/finish condition that triggers slow-motion, saves high score, then restarts the race.",
+      "id": "REQ-11",
+      "text": "Identify the error the user sees after deployment (compile-time or runtime), reproduce it locally, and implement a fix so the app loads and the Garage/Race views are usable without uncaught exceptions.",
       "target": "both",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-4"
         ],
         "quotes": [
-          "scoreText.text = \"SCORE: \" + score;",
-          "timerText.text = string.Format(\"{0:00}:{1:00}\", ...);",
-          "speedText.text = ... + \" KM/H\";",
-          "if (other.CompareTag(\"Coin\")) { score += 10; ... }",
-          "if (other.CompareTag(\"NitroRefill\")) { currentNitro = maxNitro; ... }",
-          "Time.timeScale = 0.3f; // Slow motion finish",
-          "SceneManager.LoadScene(SceneManager.GetActiveScene().name);"
+          "There is error fix it"
         ]
       },
       "acceptanceCriteria": [
-        "UI shows SCORE, HIGH SCORE, POS, TIME (mm:ss), SPEED (km/h), and NITRO.",
-        "Coins can be collected; each collection increments score by a fixed amount and removes the coin from the scene.",
-        "Nitro refill pickups refill nitro to max and are removed after collection.",
-        "A finish line or distance-based finish condition triggers a brief slow-motion effect, then restarts the race session cleanly.",
-        "High score persists across reloads via backend storage per logged-in user (and falls back to local persistence if not logged in)."
+        "Running the app after deployment does not show a blank screen or uncaught exception overlay in the browser console.",
+        "Core navigation/rendering works: the app reaches GarageView or RaceView depending on the current game state.",
+        "If an error still occurs, the UI displays an English, user-friendly message explaining what failed and how to recover (e.g., retry, logout/login)."
       ]
     },
     {
-      "id": "REQ-8",
-      "text": "Implement backend persistence in a single Motoko actor for per-user high score (and optionally last selected car index): integrate Internet Identity on the frontend to read/write the authenticated user’s high score and show it in the UI.",
+      "id": "REQ-12",
+      "text": "Fix frontend ↔ backend Candid optional type handling for user profiles so that reading and saving the profile works reliably (including first-time users). Ensure the frontend correctly unwraps optional return values and correctly encodes optional arguments when saving (do not send undefined where Candid expects an opt).",
       "target": "both",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-4"
         ],
         "quotes": [
-          "highScore = PlayerPrefs.GetInt(\"HighScore\", 0);",
-          "if (score > highScore) PlayerPrefs.SetInt(\"HighScore\", score);"
+          "There is error fix it"
         ]
       },
       "acceptanceCriteria": [
-        "Backend exposes methods to get the caller’s high score and submit a new score that updates the stored value only if it is higher.",
-        "Frontend reads the high score on load when the user is authenticated and displays it in the HUD.",
-        "Submitting a finish result updates the backend high score if the new score is higher; refreshing the app still shows the updated high score."
+        "Fetching the caller profile succeeds when authenticated and returns a consistent frontend shape (either a concrete profile object or null), without requiring callers to manually interpret Candid opt encodings.",
+        "Saving a profile from the Profile Setup modal succeeds without serialization/type errors, and subsequent profile fetch returns the saved profile.",
+        "The Profile Setup modal is shown only when the authenticated caller has no profile, and it disappears after successful save (without requiring a hard refresh)."
       ]
     },
     {
-      "id": "REQ-9",
-      "text": "Create a coherent, distinctive visual theme for the app UI and 3D presentation (colors, typography, HUD layout, and component styling) and apply it consistently across the Garage and Race views (avoid a blue/purple default palette).",
-      "target": "frontend",
+      "id": "REQ-13",
+      "text": "Fix backend user profile storage implementation to use a correct Motoko map/collection API and ensure writes actually persist in canister state (including across upgrades if applicable). Add a conditional migration only if the stable state layout changes from the currently deployed version.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-4"
+        ],
+        "quotes": [
+          "There is error fix it"
         ]
       },
       "acceptanceCriteria": [
-        "Garage and Race screens share a consistent style system (palette, type scale, spacing, button styles).",
-        "HUD is readable over the 3D scene and visually matches the app’s theme.",
-        "Theme does not rely on a generic blue/purple gradient look."
+        "Backend builds successfully with correct collection usage (no calls to non-existent instance methods on map values).",
+        "After calling saveCallerUserProfile or saveHighScore, subsequent reads return the updated values for that caller.",
+        "If the persistence mechanism introduces stable variables or changes stable layout, an upgrade does not trap and existing user data (if any) is retained via a conditional migration."
       ]
     },
     {
-      "id": "REQ-10",
-      "text": "Add basic game-state screens and controls in the frontend: Start/Resume, Restart, and an in-game pause overlay; ensure user-facing strings are in English.",
-      "target": "frontend",
+      "id": "REQ-14",
+      "text": "Adjust backend authorization behavior so that first-time authenticated users can initialize their profile without hitting an \"Unauthorized\" trap during the profile read/create flow (while keeping admin-only operations protected).",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-4"
         ],
         "quotes": [
-          "public void RestartGame() => SceneManager.LoadScene(SceneManager.GetActiveScene().name);"
+          "There is error fix it"
         ]
       },
       "acceptanceCriteria": [
-        "User can start a new run, pause/unpause, and restart without needing a page refresh.",
-        "All visible UI text is English (e.g., \"SCORE\", \"HIGH SCORE\", \"POS: 1st\", \"RESTART\")."
+        "A newly authenticated user can call the profile read endpoint without the canister trapping on authorization checks (it should return no-profile state that allows onboarding).",
+        "A newly authenticated user can successfully create/save a profile immediately after login.",
+        "Authorization protections for viewing/updating other users’ profiles remain enforced (non-admin cannot read others)."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor (no additional backend services).",
-    "Do not modify files under frontend/src/components/ui or other immutable paths listed in SYSTEM_CONTEXT; compose those components instead.",
-    "Do not add third-party auth providers; Internet Identity only for authentication."
+    "Backend must remain a single Motoko actor in backend/main.mo; only add backend/migration.mo if a stable-state upgrade is required by the fix (conditional migration policy).",
+    "Do not edit frontend immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
+    "Use English for any user-facing text added or changed."
   ],
   "nonGoals": [
-    "Recreating Unity-specific APIs, scenes, prefabs, or PlayerPrefs exactly in the web app.",
-    "Shipping 100+ car models; provide a small set of representative car variants suitable for a web demo.",
-    "Realistic vehicle physics simulation; keep physics arcade-style and performant.",
-    "Multiplayer, real-time networking, or chat."
+    "Adding new gameplay features (cars, tracks, new UI systems) beyond what is necessary to fix the error.",
+    "Introducing external databases or third-party authentication providers beyond Internet Identity.",
+    "Implementing real-time features (WebSockets/chat) or new backend services."
   ],
   "imageRequirements": {
-    "required": [
-      "Arcade racing game logo with a stylized car silhouette and bold typography (logo.dim_512x512.png)",
-      "Seamless asphalt/road texture with subtle wear and lane markings (road-texture.dim_1024x1024.png)",
-      "Coin icon with metallic gold look, simple readable shape (coin-icon.dim_256x256.png)",
-      "Nitro/boost icon with a flame/jet motif (nitro-icon.dim_256x256.png)",
-      "Sky gradient background image suitable as a distant skybox/backdrop (sky-gradient.dim_2048x1024.png)"
-    ],
+    "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

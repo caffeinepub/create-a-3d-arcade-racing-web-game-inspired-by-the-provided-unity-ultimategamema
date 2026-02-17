@@ -1,112 +1,58 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T17:51:42.590Z",
-  "summary": "Diff adds a Motoko backend actor for user profiles/high score plus a React/Three.js racing frontend with garage selection, basic controls, scene, lighting rig (day/night), rain particles, boost trails, pickups rendering, and view/state overlays. Several acceptance-criteria items cannot be verified due to omitted/truncated files, and some requirements appear missing or only partially implemented based on visible code (notably backend high-score update logic, wipers, and tilt toggle integration).",
+  "generatedAt": "2026-02-15T17:59:38.376Z",
+  "summary": "Diff adds an app-level React error boundary + fatal error screen, a profile fetch error banner, a Profile Setup modal flow, a Candid optional helper, and backend changes to profile/high-score endpoints plus a migration stub. However, the core requested fixes around Candid optional encoding/decoding and Motoko state persistence appear incomplete/incorrect based on the shown changes.",
   "missing_requirements": [
     {
-      "id": "REQ-1",
-      "requirement": "Optional mobile tilt steering can be toggled on and used on mobile without breaking keyboard input.",
-      "reason": "A tilt hook exists, but the diff provides no evidence of any UI/control to toggle tilt steering or of tilt being combined with keyboard steer in the driving/physics code.",
+      "id": "REQ-12",
+      "requirement": "Fix frontend ↔ backend Candid optional type handling for user profiles so that reading and saving the profile works reliably (including first-time users). Ensure the frontend correctly unwraps optional return values and correctly encodes optional arguments when saving (do not send undefined where Candid expects an opt).",
+      "reason": "The profile read hook does not unwrap the common JS representation of Candid `opt` (often `[]` for none and `[value]` for some). It checks only `null/undefined` and then treats `result` as an object, which would break if `result` is `[]` or `[profile]`. On save, `lastSelectedCarIndex: undefined` is passed, which may not match the generated candid bindings expectation (typically `[]`/`[value]`), and the added `wrapOption` helper is not used.",
       "evidence": [
-        "frontend/src/game/controls/useTiltSteering.ts",
-        "frontend/src/game/controls/useKeyboardDrivingControls.ts"
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/utils/candidOption.ts",
+        "frontend/src/auth/ProfileSetupModal.tsx"
       ]
     },
     {
-      "id": "REQ-5",
-      "requirement": "Animate windshield wipers on the player car when raining.",
-      "reason": "Rain particle effect is present, and rain state is used, but there is no evidence of any wiper mesh/animation on the player car model or any wiper effect component triggered by rain.",
+      "id": "REQ-13",
+      "requirement": "Fix backend user profile storage implementation to use a correct Motoko map/collection API and ensure writes actually persist in canister state (including across upgrades if applicable).",
+      "reason": "`userProfiles` is defined as an immutable `let` with `Map.empty(...)` and updates use `userProfiles.add(...)` without reassigning; for functional/persistent map APIs this would not persist writes. Additionally, there is no evidence of `stable` storage or upgrade hooks to persist state across upgrades, despite adding a migration file.",
       "evidence": [
-        "frontend/src/game/scene/effects/RainEffect.tsx",
-        "frontend/src/game/scene/CarModel.tsx",
-        "frontend/src/game/scene/RaceScene.tsx"
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "requirement": "Finish line/finish condition triggers slow-motion, saves high score, then restarts the race session cleanly.",
-      "reason": "A finish overlay component is referenced, and constants include a finish distance, but the diff shows no implementation of the finish condition, slow-motion effect, high-score submission, or restart flow (files likely omitted).",
-      "evidence": [
-        "frontend/src/game/RaceView.tsx",
-        "frontend/src/game/sim/constants.ts"
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "requirement": "Backend method to submit a new score updates the stored value only if it is higher (per-user high score persistence).",
-      "reason": "Backend save methods overwrite the stored score/profile with the provided value and do not compare against an existing high score. This violates the “only if higher” acceptance criteria.",
-      "evidence": [
-        "backend/main.mo"
+        "backend/main.mo",
+        "backend/migration.mo"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Profile setup modal requiring a user-entered name, despite backend UserProfile not containing a name field.",
-      "reason": "BuildRequest does not request a user name or profile onboarding flow; backend type only includes highScore and lastSelectedCarIndex, and the entered name is not persisted.",
+      "description": "Added a backend migration module and enabled migration in the actor even though the shown state is not `stable` and the old/new layouts are identical (no transformation).",
+      "reason": "BuildRequest constraint says to add `backend/migration.mo` only if a stable-state upgrade is required by the fix (conditional migration policy). The diff adds it unconditionally and wires it in via `(with migration = Migration.run)` without demonstrating a stable-layout change that requires migration.",
       "evidence": [
-        "frontend/src/auth/ProfileSetupModal.tsx",
+        "backend/migration.mo",
         "backend/main.mo"
       ]
     },
     {
-      "description": "Backend admin/authorization features for viewing other users’ profiles (getUserProfile with admin check) and permission gating/traps.",
-      "reason": "BuildRequest only asks for per-user high score persistence via Internet Identity; admin access control and cross-user profile lookup are not requested.",
+      "description": "Profile Setup modal collects a user name but the backend `UserProfile` type does not include a name field, so the input is unused.",
+      "reason": "Not requested by the BuildRequest, and the diff shows no backend support for saving/reading a name; this introduces UI/logic that doesn’t map to the profile data model involved in the error fix.",
       "evidence": [
+        "frontend/src/auth/ProfileSetupModal.tsx",
         "backend/main.mo"
       ]
     }
   ],
-  "confidence": 0.64,
+  "confidence": 0.74,
   "changed_files": [
-    "all_files_summary.json",
     "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/index.css",
-    "frontend/index.html",
     "frontend/src/App.tsx",
-    "frontend/src/auth/LoginButton.tsx",
     "frontend/src/auth/ProfileSetupModal.tsx",
-    "frontend/src/game/RaceView.tsx",
-    "frontend/src/game/controls/useKeyboardDrivingControls.ts",
-    "frontend/src/game/controls/useTiltSteering.ts",
-    "frontend/src/game/garage/GarageView.tsx",
-    "frontend/src/game/garage/carLibrary.ts",
-    "frontend/src/game/garage/useSelectedCar.ts",
-    "frontend/src/game/persistence/useHighScore.ts",
-    "frontend/src/game/scene/CameraRig.tsx",
-    "frontend/src/game/scene/CarModel.tsx",
-    "frontend/src/game/scene/Environment.tsx",
-    "frontend/src/game/scene/LightingRig.tsx",
-    "frontend/src/game/scene/RaceScene.tsx",
-    "frontend/src/game/scene/effects/BoostTrails.tsx",
-    "frontend/src/game/scene/effects/RainEffect.tsx",
-    "frontend/src/game/scene/pickups/Pickups.tsx",
-    "frontend/src/game/sim/constants.ts",
-    "frontend/src/game/sim/dayNight.ts",
-    "frontend/src/game/sim/progress.ts",
-    "frontend/src/game/sim/scoring.ts",
-    "frontend/src/game/sim/useCarPhysics.ts",
-    "frontend/src/game/sim/useNitro.ts",
-    "frontend/src/game/sim/usePickups.ts",
-    "frontend/src/game/sim/useRaceTimer.ts",
-    "frontend/src/game/sim/useRivalAI.ts",
-    "frontend/src/game/sim/useSpeedometer.ts",
-    "frontend/src/game/sim/weather.ts",
-    "frontend/src/game/state/gameState.ts",
-    "frontend/src/game/ui/ControlsHelp.tsx",
-    "frontend/src/game/ui/FinishOverlay.tsx",
-    "frontend/src/game/ui/HUD.tsx",
-    "frontend/src/game/ui/PauseOverlay.tsx",
-    "frontend/src/game/ui/StartOverlay.tsx",
-    "frontend/src/hooks/useActor.ts",
-    "frontend/src/hooks/useInternetIdentity.ts",
+    "frontend/src/components/AppErrorBoundary.tsx",
+    "frontend/src/components/AppFatalErrorScreen.tsx",
     "frontend/src/hooks/useQueries.ts",
-    "frontend/src/index.css",
-    "frontend/src/main.tsx",
-    "frontend/src/utils/urlParams.ts",
-    "frontend/tailwind.config.js",
+    "frontend/src/utils/candidOption.ts",
     "project_state.json"
   ]
 }

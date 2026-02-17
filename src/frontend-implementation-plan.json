@@ -1,458 +1,62 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "3D Arcade Racing Web Game (React + React Three Fiber)",
+  "title": "Fix frontend runtime error + robust profile optional handling",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Build the core playable 3D arcade racing loop (forward motion, steering, brake, drift, optional tilt steering) using React Three Fiber.",
+      "id": "REQ-11",
+      "summary": "Prevent blank screen/uncaught exceptions after deployment and ensure Garage/Race views render with a user-friendly fallback on failure.",
       "acceptanceCriteria": [
-        "A 3D scene renders in the browser with a controllable player car and a visible track/ground plane.",
-        "Keyboard controls: left/right steer; brake key reduces/halts forward speed; gameplay is smooth at 60fps on a typical laptop.",
-        "If device orientation is available, tilt steering can be toggled on and used on mobile without breaking keyboard input on desktop.",
-        "A drift state activates when steering exceeds a threshold, visibly altering handling (e.g., lower lateral grip / more slide)."
+        "Running the app after deployment does not show a blank screen or uncaught exception overlay in the browser console.",
+        "Core navigation/rendering works: the app reaches GarageView or RaceView depending on the current game state.",
+        "If an error still occurs, the UI displays an English, user-friendly message explaining what failed and how to recover (e.g., retry, logout/login)."
       ],
       "file_operations": [
         {
-          "path": "frontend/package.json",
-          "operation": "modify",
-          "description": "Add/confirm required 3D runtime dependencies for React Three Fiber + Three.js (and any helpers used) so the 3D scene and render loop can run in the React frontend."
+          "path": "frontend/src/components/AppErrorBoundary.tsx",
+          "operation": "create",
+          "description": "Add a React error boundary that catches render-time errors from the app shell (including GarageView/RaceView) and renders an English recovery UI (retry reload, logout/login guidance)."
         },
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/AppFatalErrorScreen.tsx",
           "operation": "create",
-          "description": "Create the app shell that hosts the required Garage and Race views and wires navigation between them (no orphan views)."
-        },
-        {
-          "path": "frontend/src/game/RaceView.tsx",
-          "operation": "create",
-          "description": "Implement the main Race view containing the React Three Fiber Canvas and the game loop wiring for player movement, steering, brake, and drift handling."
-        },
-        {
-          "path": "frontend/src/game/scene/RaceScene.tsx",
-          "operation": "create",
-          "description": "Create the 3D scene graph (camera, lights, ground/track plane, player car root object) and connect it to the simulation state."
-        },
-        {
-          "path": "frontend/src/game/sim/useCarPhysics.ts",
-          "operation": "create",
-          "description": "Implement arcade-style car kinematics for continuous forward motion, left/right steering, brake/stop, and a drift mode that reduces lateral grip past a steering threshold."
-        },
-        {
-          "path": "frontend/src/game/controls/useKeyboardDrivingControls.ts",
-          "operation": "create",
-          "description": "Implement keyboard input mapping (steer left/right, brake, boost reserved for REQ-6) and expose normalized control values to the simulation."
-        },
-        {
-          "path": "frontend/src/game/controls/useTiltSteering.ts",
-          "operation": "create",
-          "description": "Implement optional device-orientation tilt steering with a user toggle; ensure it composes with (does not break) keyboard input when orientation is unavailable."
-        },
-        {
-          "path": "frontend/src/game/sim/constants.ts",
-          "operation": "create",
-          "description": "Centralize tunable simulation constants (speed, acceleration, steering sensitivity, drift threshold, friction/grip) to keep arcade handling performant and adjustable."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Add a modular Garage car selection UI with at least 6 variants, show selected car name, and persist selection across reloads.",
-      "acceptanceCriteria": [
-        "A Garage screen/panel lets the user cycle/select among multiple car variants.",
-        "The selected car name is shown in the UI.",
-        "The selection persists after refresh (e.g., via local storage) and is applied when starting the race."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/garage/carLibrary.ts",
-          "operation": "create",
-          "description": "Define at least 6 car variants (names + simple model/skin parameters) used by both the Garage preview and in-race player car instantiation."
-        },
-        {
-          "path": "frontend/src/game/garage/useSelectedCar.ts",
-          "operation": "create",
-          "description": "Persist selected car index/name in local storage and expose setters/getters for Garage and Race views (and for optional backend sync used in REQ-8)."
-        },
-        {
-          "path": "frontend/src/game/garage/GarageView.tsx",
-          "operation": "create",
-          "description": "Implement the Garage view/panel to browse/select car variants, display the current car name, and provide a clear action to start the race."
-        },
-        {
-          "path": "frontend/src/game/scene/CarModel.tsx",
-          "operation": "create",
-          "description": "Render a lightweight car model/skin based on the selected variant (procedural geometry/materials or simple meshes) for both player and AI cars."
+          "description": "Add a simple, accessible fatal error screen component used by the error boundary and/or top-level app state to show friendly error text and recovery actions."
         },
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Wire the Garage view into the app navigation/state so selection persists and is applied when transitioning into the Race view."
+          "description": "Wrap the application content with AppErrorBoundary so render/runtime exceptions do not blank the screen; ensure the app still renders GarageView/RaceView while handling profile-fetch errors gracefully (e.g., show a non-blocking banner/toast + recovery actions). Verify the authorization component's frontend usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-3",
-      "summary": "Add an AI rival car that follows the track with deterministic behavior and show a 1st/2nd position indicator based on relative forward progress.",
+      "id": "REQ-12",
+      "summary": "Fix Candid optional handling for user profile read/save so first-time users can fetch null and save without opt/undefined serialization issues; show Profile Setup modal only when needed and dismiss after save.",
       "acceptanceCriteria": [
-        "A rival car is visible in the 3D scene during the race.",
-        "A UI label shows \"POS: 1st\" or \"POS: 2nd\" and updates as the player overtakes or falls behind the rival."
+        "Fetching the caller profile succeeds when authenticated and returns a consistent frontend shape (either a concrete profile object or null), without requiring callers to manually interpret Candid opt encodings.",
+        "Saving a profile from the Profile Setup modal succeeds without serialization/type errors, and subsequent profile fetch returns the saved profile.",
+        "The Profile Setup modal is shown only when the authenticated caller has no profile, and it disappears after successful save (without requiring a hard refresh)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/sim/useRivalAI.ts",
+          "path": "frontend/src/utils/candidOption.ts",
           "operation": "create",
-          "description": "Implement a simple deterministic AI rival behavior (constant target speed + minor lateral variation) producing a rival transform over time."
+          "description": "Add small helpers to normalize/unwrap possible Candid Option encodings on reads and to safely encode optionals on writes (so callers never pass undefined where an opt is expected)."
         },
         {
-          "path": "frontend/src/game/sim/progress.ts",
-          "operation": "create",
-          "description": "Implement progress calculation along the forward axis and compute relative position (player vs rival) to drive the POS label logic."
-        },
-        {
-          "path": "frontend/src/game/scene/RaceScene.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add the rival car instance to the 3D scene and connect it to the AI simulation output."
+          "description": "Normalize getCallerUserProfile results into a stable shape (UserProfile | null), unwrapping any Option-like encodings if returned at runtime; update saveCallerUserProfile mutation to encode optional fields correctly (avoid undefined; encode as proper opt/absence) and update/invalidate the react-query cache so the Profile Setup modal closes immediately after success. Verify the authorization component's frontend usage instructions before implementing."
         },
         {
-          "path": "frontend/src/game/ui/HUD.tsx",
-          "operation": "create",
-          "description": "Create a HUD layer that includes the required POS indicator text and updates it based on simulation progress."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Implement a day/night cycle with an animated sun light and automatic car headlight toggling at night, with configurable day duration.",
-      "acceptanceCriteria": [
-        "Lighting changes over time to simulate day-to-night progression on a loop.",
-        "At night, car headlights visibly turn on; during day, they turn off.",
-        "Day duration is configurable from a single constant/config value in the frontend."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/sim/dayNight.ts",
-          "operation": "create",
-          "description": "Implement a looping day/night time function with a single configurable dayDuration constant and a derived \"night\" boolean."
-        },
-        {
-          "path": "frontend/src/game/scene/LightingRig.tsx",
-          "operation": "create",
-          "description": "Create a scene lighting rig that animates a sun/directional light over time and adjusts ambient/scene lighting for day/night progression."
-        },
-        {
-          "path": "frontend/src/game/scene/CarLights.tsx",
-          "operation": "create",
-          "description": "Implement car headlight visuals (e.g., spot/point lights attached to the car) that toggle based on the dayNight \"night\" state."
-        },
-        {
-          "path": "frontend/src/game/scene/RaceScene.tsx",
+          "path": "frontend/src/auth/ProfileSetupModal.tsx",
           "operation": "modify",
-          "description": "Wire the LightingRig and car headlight toggling into the Race scene so all cars respond to night state."
-        },
-        {
-          "path": "frontend/src/game/sim/constants.ts",
-          "operation": "modify",
-          "description": "Add a single exported configuration value for day duration used by the day/night cycle."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Add a weather system with random rain toggles, visible rain effect, animated windshield wipers, and wet-road handling modifier.",
-      "acceptanceCriteria": [
-        "Rain can toggle on/off during gameplay (randomly and/or via a debug UI toggle).",
-        "When raining, a visible rain effect is present and wipers animate on the player car.",
-        "When raining, handling becomes noticeably more slippery compared to dry conditions."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/sim/weather.ts",
-          "operation": "create",
-          "description": "Implement weather state with random rain toggling logic and expose isRaining plus a manual debug toggle for development/testing."
-        },
-        {
-          "path": "frontend/src/game/scene/effects/RainEffect.tsx",
-          "operation": "create",
-          "description": "Implement a lightweight rain particle/line effect in the 3D scene that is only visible when isRaining is true."
-        },
-        {
-          "path": "frontend/src/game/scene/CarWipers.tsx",
-          "operation": "create",
-          "description": "Implement a simple windshield wiper animation attached to the player car that runs only while raining."
-        },
-        {
-          "path": "frontend/src/game/sim/useCarPhysics.ts",
-          "operation": "modify",
-          "description": "Apply a wet-road handling modifier when raining (e.g., reduced grip / increased lateral slip) to make the car noticeably more slippery than dry conditions."
-        },
-        {
-          "path": "frontend/src/game/scene/RaceScene.tsx",
-          "operation": "modify",
-          "description": "Wire weather state into the 3D scene: toggle RainEffect visibility and trigger player wiper animation when raining."
-        },
-        {
-          "path": "frontend/src/game/ui/DebugToggles.tsx",
-          "operation": "create",
-          "description": "Add an optional debug UI toggle to force rain on/off during gameplay for validation."
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Implement nitro/boost mechanics with depletion/regeneration, speed increase, nitro HUD bar, boost trails, and stronger camera shake while boosting.",
-      "acceptanceCriteria": [
-        "Holding the boost key activates boost if nitro > 0; nitro decreases while active and regenerates when inactive.",
-        "Boost increases forward speed compared to normal driving.",
-        "A nitro UI bar reflects current nitro in real time.",
-        "Boost trails/visual effects toggle on only while boosting.",
-        "Camera shake is stronger during boost than during normal driving."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/sim/useNitro.ts",
-          "operation": "create",
-          "description": "Implement nitro resource state (max/current), depletion while boosting, regeneration when not boosting, and an isBoosting flag."
-        },
-        {
-          "path": "frontend/src/game/controls/useKeyboardDrivingControls.ts",
-          "operation": "modify",
-          "description": "Add boost key handling (e.g., Space) and expose a boost intent that the nitro system can gate based on current nitro."
-        },
-        {
-          "path": "frontend/src/game/sim/useCarPhysics.ts",
-          "operation": "modify",
-          "description": "Integrate boost into the forward speed cap/acceleration when isBoosting is active."
-        },
-        {
-          "path": "frontend/src/game/scene/effects/BoostTrails.tsx",
-          "operation": "create",
-          "description": "Implement boost trail/visual effect that is enabled only while boosting."
-        },
-        {
-          "path": "frontend/src/game/scene/CameraRig.tsx",
-          "operation": "create",
-          "description": "Implement a follow camera rig with camera shake that increases intensity when boosting compared to normal driving."
-        },
-        {
-          "path": "frontend/src/game/ui/HUD.tsx",
-          "operation": "modify",
-          "description": "Add a nitro UI bar/slider element that updates in real time from the nitro system."
-        },
-        {
-          "path": "frontend/src/game/scene/RaceScene.tsx",
-          "operation": "modify",
-          "description": "Wire BoostTrails and CameraRig into the scene and connect them to isBoosting state."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Add HUD + scoring systems (score/high score/pos/time/speed/nitro), collectibles (coins, nitro refills), and a finish condition with slow-motion then clean restart.",
-      "acceptanceCriteria": [
-        "UI shows SCORE, HIGH SCORE, POS, TIME (mm:ss), SPEED (km/h), and NITRO.",
-        "Coins can be collected; each collection increments score by a fixed amount and removes the coin from the scene.",
-        "Nitro refill pickups refill nitro to max and are removed after collection.",
-        "A finish line or distance-based finish condition triggers a brief slow-motion effect, then restarts the race session cleanly.",
-        "High score persists across reloads via backend storage per logged-in user (and falls back to local persistence if not logged in)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/sim/scoring.ts",
-          "operation": "create",
-          "description": "Implement score state updates, coin value constants, and high-score comparison logic that can be driven by pickups and finish events."
-        },
-        {
-          "path": "frontend/src/game/sim/useRaceTimer.ts",
-          "operation": "create",
-          "description": "Implement a race timer with mm:ss formatting and pause-aware behavior for the HUD."
-        },
-        {
-          "path": "frontend/src/game/sim/useSpeedometer.ts",
-          "operation": "create",
-          "description": "Compute and expose speed (km/h) derived from the car simulation for the HUD."
-        },
-        {
-          "path": "frontend/src/game/scene/pickups/CoinPickup.tsx",
-          "operation": "create",
-          "description": "Create a coin pickup 3D object that can be collected by the player, increments score, and is removed from the scene after collection."
-        },
-        {
-          "path": "frontend/src/game/scene/pickups/NitroRefillPickup.tsx",
-          "operation": "create",
-          "description": "Create a nitro refill pickup 3D object that refills nitro to max and is removed from the scene after collection."
-        },
-        {
-          "path": "frontend/src/game/scene/pickups/pickupPlacement.ts",
-          "operation": "create",
-          "description": "Define deterministic placement/spawn list for coins and nitro refills along the track so collection can be validated consistently."
-        },
-        {
-          "path": "frontend/src/game/sim/finish.ts",
-          "operation": "create",
-          "description": "Implement a finish line / distance-based finish condition; on finish trigger brief slow-motion and then reset race state for a clean restart without page refresh."
-        },
-        {
-          "path": "frontend/src/game/persistence/highScore.ts",
-          "operation": "create",
-          "description": "Implement high score persistence strategy: use backend high score when authenticated (see REQ-8 wiring) and fall back to local storage when not authenticated."
-        },
-        {
-          "path": "frontend/src/game/ui/HUD.tsx",
-          "operation": "modify",
-          "description": "Expand HUD to show SCORE, HIGH SCORE, POS, TIME (mm:ss), SPEED (km/h), and NITRO, ensuring readability over the 3D scene."
-        },
-        {
-          "path": "frontend/src/game/RaceView.tsx",
-          "operation": "modify",
-          "description": "Wire scoring, timer, speedometer, pickups, and finish handling into the Race view, including slow-motion effect and clean session restart."
-        }
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "summary": "Integrate Internet Identity in the frontend to read/write authenticated per-user high score (and optionally last selected car index) and display high score in the HUD.",
-      "acceptanceCriteria": [
-        "Backend exposes methods to get the caller’s high score and submit a new score that updates the stored value only if it is higher.",
-        "Frontend reads the high score on load when the user is authenticated and displays it in the HUD.",
-        "Submitting a finish result updates the backend high score if the new score is higher; refreshing the app still shows the updated high score."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/auth/LoginButton.tsx",
-          "operation": "create",
-          "description": "Create a login/logout button using the existing Internet Identity hook from the authorization component to support authenticated high-score persistence. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/auth/useCallerProfile.ts",
-          "operation": "create",
-          "description": "Create React Query hooks to read the caller profile/high score when authenticated via the existing actor hook (and handle unauthenticated/guest states gracefully). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/game/persistence/useBackendHighScore.ts",
-          "operation": "create",
-          "description": "Implement frontend logic to fetch and submit high scores through the existing backend actor when authenticated (and expose status/errors for UI)."
-        },
-        {
-          "path": "frontend/src/game/garage/useSelectedCar.ts",
-          "operation": "modify",
-          "description": "Optionally sync last selected car index into the authenticated user profile when logged in, while still persisting locally for anonymous/offline use."
-        },
-        {
-          "path": "frontend/src/game/ui/HUD.tsx",
-          "operation": "modify",
-          "description": "Wire authenticated high score loading into the HUD (fallback to local high score when not logged in) and ensure it displays in real time after a finish submission."
+          "description": "Stop sending `lastSelectedCarIndex: undefined` (omit the field or encode as an explicit opt-none per candidOption helpers); handle save errors with English user-friendly messaging and ensure modal closes after successful save via the updated query cache behavior. Verify the authorization component's frontend usage instructions before implementing."
         },
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Place the LoginButton in the shared UI (Garage and Race views) and ensure logout clears cached authenticated data via React Query. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-9",
-      "summary": "Create and apply a distinctive, coherent UI + 3D visual theme across Garage and Race (non blue/purple default), including HUD readability.",
-      "acceptanceCriteria": [
-        "Garage and Race screens share a consistent style system (palette, type scale, spacing, button styles).",
-        "HUD is readable over the 3D scene and visually matches the app’s theme.",
-        "Theme does not rely on a generic blue/purple gradient look."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "create",
-          "description": "Add global styles and Tailwind CSS variables/theme tokens to establish a distinctive palette/typography (avoid default blue/purple look) and improve HUD readability (contrast, shadows/backplates)."
-        },
-        {
-          "path": "frontend/tailwind.config.js",
-          "operation": "modify",
-          "description": "Adjust Tailwind theme extensions/variables as needed to support the new brand palette and consistent component styling across views."
-        },
-        {
-          "path": "frontend/public/assets/generated/logo.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated game logo asset at this exact path and wire it into the UI where appropriate (e.g., Garage header/HUD branding)."
-        },
-        {
-          "path": "frontend/public/assets/generated/road-texture.dim_1024x1024.png",
-          "operation": "create",
-          "description": "Add the generated road texture asset at this exact path and use it for the track/ground material in the 3D scene."
-        },
-        {
-          "path": "frontend/public/assets/generated/coin-icon.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated coin icon asset at this exact path and use it in the HUD next to score and/or as pickup UI affordance."
-        },
-        {
-          "path": "frontend/public/assets/generated/nitro-icon.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated nitro icon asset at this exact path and use it in the HUD next to the nitro bar."
-        },
-        {
-          "path": "frontend/public/assets/generated/sky-gradient.dim_2048x1024.png",
-          "operation": "create",
-          "description": "Add the generated sky gradient asset at this exact path and use it as a skybox/backdrop in the 3D scene."
-        },
-        {
-          "path": "frontend/src/game/scene/Environment.tsx",
-          "operation": "create",
-          "description": "Implement 3D environment styling (sky backdrop using frontend/public/assets/generated/sky-gradient.dim_2048x1024.png and road material using frontend/public/assets/generated/road-texture.dim_1024x1024.png) to match the theme."
-        },
-        {
-          "path": "frontend/src/game/ui/HUD.tsx",
-          "operation": "modify",
-          "description": "Apply consistent HUD layout/typography, including icon usage from frontend/public/assets/generated/coin-icon.dim_256x256.png and frontend/public/assets/generated/nitro-icon.dim_256x256.png."
-        },
-        {
-          "path": "frontend/src/game/garage/GarageView.tsx",
-          "operation": "modify",
-          "description": "Apply the shared theme (layout, typography, button styling) and include branding with frontend/public/assets/generated/logo.dim_512x512.png."
-        },
-        {
-          "path": "frontend/src/game/scene/RaceScene.tsx",
-          "operation": "modify",
-          "description": "Wire the new Environment component into the race scene to ensure the 3D presentation matches the app theme."
-        }
-      ]
-    },
-    {
-      "id": "REQ-10",
-      "summary": "Add start/resume, restart, and pause overlay controls, with all user-facing UI strings in English.",
-      "acceptanceCriteria": [
-        "User can start a new run, pause/unpause, and restart without needing a page refresh.",
-        "All visible UI text is English (e.g., \"SCORE\", \"HIGH SCORE\", \"POS: 1st\", \"RESTART\")."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/state/gameState.ts",
-          "operation": "create",
-          "description": "Implement a simple game state machine (e.g., garage, ready, running, paused, finished) that drives UI screens and simulation ticking."
-        },
-        {
-          "path": "frontend/src/game/ui/PauseOverlay.tsx",
-          "operation": "create",
-          "description": "Create an in-game pause overlay with English strings (e.g., \"PAUSED\", \"RESUME\", \"RESTART\", \"GARAGE\") and wire buttons to game state actions."
-        },
-        {
-          "path": "frontend/src/game/ui/StartOverlay.tsx",
-          "operation": "create",
-          "description": "Create a start/resume control overlay for beginning a run from the Race view with English strings (e.g., \"START\", \"RESUME\")."
-        },
-        {
-          "path": "frontend/src/game/ui/ControlsHelp.tsx",
-          "operation": "create",
-          "description": "Add a small English help panel/tooltip describing controls (steer, brake, boost, pause, tilt toggle) without adding new routes."
-        },
-        {
-          "path": "frontend/src/game/RaceView.tsx",
-          "operation": "modify",
-          "description": "Wire pause/unpause (including key binding like Escape), restart, and start/resume overlays into the Race view; ensure simulation and timer respect pause state."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Ensure navigation/state transitions support restarting a run and returning to Garage without refreshing the page, and that all user-visible strings remain English."
+          "description": "Tighten the modal gating logic to rely on the normalized profile shape and avoid modal flash; ensure the modal is shown only when authenticated AND profile fetch is resolved AND the profile is null, and remains hidden when fetch fails (show recovery UI instead). Verify the authorization component's frontend usage instructions before implementing."
         }
       ]
     }

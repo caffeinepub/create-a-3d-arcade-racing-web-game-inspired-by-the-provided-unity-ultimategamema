@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 3,
+  "projectStateVersion": 5,
   "summary": "Unity (3D) arcade racing game prototype centered on an \"UltimateGameMaster\" controller: modular garage with many cars, AI rival position display, day/night cycle and random rain with wipers/headlights, nitro/drift driving, UI (score/speed/timer), collectibles, and finish/restart loop.",
   "architectural_notes": [
     "Unity C# MonoBehaviour-centric design with a single game master script coordinating subsystems (garage, world, input/physics, UI, scoring).",
@@ -10,10 +10,10 @@
   ],
   "known_issues": [
     "Code calls UpdateScoreUI() in Start() but no UpdateScoreUI() method is defined in the provided script.",
-    "Script uses rb.linearVelocity; in standard Unity Rigidbody API this is rb.velocity (linearVelocity may not compile depending on Unity/physics package)."
+    "Script uses rb.linearVelocity; in standard Unity Rigidbody API this is rb.velocity (linearVelocity may not compile depending on Unity/physics package).",
+    "User reports an unspecified error after deployment; error details/logs not provided yet, blocking targeted fix."
   ],
-  "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Arcade racing game logo with a stylized car silhouette and bold typography (logo.dim_512x512.png)\n- Seamless asphalt/road texture with subtle wear and lane markings (road-texture.dim_1024x1024.png)\n- Coin icon with metallic gold look, simple readable shape (coin-icon.dim_256x256.png)\n- Nitro/boost icon with a flame/jet motif (nitro-icon.dim_256x256.png)\n- Sky gradient background image suitable as a distant skybox/backdrop (sky-gradient.dim_2048x1024.png)",
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-implement-a-playable-3d-arcade-racing-loop-in-the-react-frontend-using-three-js-react-three-fiber-the-player-car-continuously-moves-forward-supports-steering-left-right-keyboard-and-optional-mobile-tilt-steering-has-a-simple-drift-handling-mode-at-high-steering-input-and-can-brake-stop-forward-movement",
@@ -94,6 +94,22 @@
         "REQ-10"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-identify-the-error-the-user-sees-after-deployment-compile-time-or-runtime-reproduce-it-locally-and-implement-a-fix-so-the-app-loads-and-the-garage-race-views-are-usable-without-uncaught-exceptions",
+      "title": "Identify the error the user sees after deployment (compile-time or runtime), reproduce it locally, and implement a fix so the app loads and the Garage/Race views are usable without uncaught exceptions.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-frontend-backend-candid-optional-type-handling-for-user-profiles-so-that-reading-and-saving-the-profile-works-reliably-including-first-time-users-ensure-the-frontend-correctly-unwraps-optional-return-values-and-correctly-encodes-optional-arguments-when-saving-do-not-send-undefined-where-candid-expects-an-opt",
+      "title": "Fix frontend ↔ backend Candid optional type handling for user profiles so that reading and saving the profile works reliably (including first-time users). Ensure the frontend correctly unwraps optional return values and correctly encodes optional arguments when saving (do not send undefined where Candid expects an opt).",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -137,6 +153,22 @@
       "id": "AR-7",
       "summary": "UI + scoring: score, high score persistence, timer, speed readout; collectible coin/nitro refill triggers and finish line slow-motion + restart",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Fix backend user profile storage implementation to use a correct Motoko map/collection API and ensure writes actually persist in canister state (including across upgrades if applicable). Add a conditional migration only if the stable state layout changes from the currently deployed version.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Adjust backend authorization behavior so that first-time authenticated users can initialize their profile without hitting an \"Unauthorized\" trap during the profile read/create flow (while keeping admin-only operations protected).",
+      "reqIds": [
+        "REQ-14"
+      ],
       "status": "pending"
     }
   ],
